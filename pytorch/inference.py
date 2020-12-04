@@ -28,7 +28,8 @@ def audio_tagging(args):
     checkpoint_path = args.checkpoint_path
     audio_path = args.audio_path
     device = torch.device('cuda') if args.cuda and torch.cuda.is_available() else torch.device('cpu')
-    
+    onnx_export = args.onnx_export
+
     classes_num = config.classes_num
     labels = config.labels
 
@@ -59,6 +60,14 @@ def audio_tagging(args):
     with torch.no_grad():
         model.eval()
         batch_output_dict = model(waveform, None)
+        if onnx_export is not None:
+            print("Export ONNX to: %s" % onnx_export)
+            torch.onnx.export(
+                model, waveform, onnx_export,
+                verbose=True,
+                export_params=True,
+                opset_version=11,
+                do_constant_folding=True)
 
     clipwise_output = batch_output_dict['clipwise_output'].data.cpu().numpy()[0]
     """(classes_num,)"""
@@ -93,6 +102,7 @@ def sound_event_detection(args):
     checkpoint_path = args.checkpoint_path
     audio_path = args.audio_path
     device = torch.device('cuda') if args.cuda and torch.cuda.is_available() else torch.device('cpu')
+    onnx_export = args.onnx_export
 
     classes_num = config.classes_num
     labels = config.labels
@@ -128,6 +138,14 @@ def sound_event_detection(args):
     with torch.no_grad():
         model.eval()
         batch_output_dict = model(waveform, None)
+        if onnx_export is not None:
+            print("Export ONNX to: %s" % onnx_export)
+            torch.onnx.export(
+                model, waveform, onnx_export,
+                verbose=True,
+                export_params=True,
+                opset_version=11,
+                do_constant_folding=True)
 
     framewise_output = batch_output_dict['framewise_output'].data.cpu().numpy()[0]
     """(time_steps, classes_num)"""
@@ -181,6 +199,7 @@ if __name__ == '__main__':
     parser_at.add_argument('--model_type', type=str, required=True)
     parser_at.add_argument('--checkpoint_path', type=str, required=True)
     parser_at.add_argument('--audio_path', type=str, required=True)
+    parser_at.add_argument('--onnx_export', required=False, default=None)
     parser_at.add_argument('--cuda', action='store_true', default=False)
 
     parser_sed = subparsers.add_parser('sound_event_detection')
@@ -193,6 +212,7 @@ if __name__ == '__main__':
     parser_sed.add_argument('--model_type', type=str, required=True)
     parser_sed.add_argument('--checkpoint_path', type=str, required=True)
     parser_sed.add_argument('--audio_path', type=str, required=True)
+    parser_sed.add_argument('--onnx_export', required=False, default=None)
     parser_sed.add_argument('--cuda', action='store_true', default=False)
     
     args = parser.parse_args()
