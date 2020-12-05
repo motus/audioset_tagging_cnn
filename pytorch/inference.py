@@ -13,6 +13,40 @@ from pytorch_utils import move_data_to_device
 import config
 
 
+def eval_model(model, waveform, onnx_export=None):
+
+    # Forward
+    with torch.no_grad():
+
+        model.eval()
+
+        hidden = None
+        if 'prepare' in dir(model):
+            features_etc = model.prepare(waveform)
+        else:
+            features_etc = waveform
+
+        if isinstance(features_etc, tuple):
+            (features, hidden) = features_etc
+            batch_output_dict = model(features, hidden, None)
+        else:
+            features = features_etc
+            batch_output_dict = model(features, None)
+
+        if onnx_export is not None:
+            print("Export ONNX to: %s" % onnx_export)
+            torch.onnx.export(
+                model,
+                features if hidden is None else (features, hidden),
+                onnx_export,
+                verbose=True,
+                export_params=True,
+                opset_version=11,
+                do_constant_folding=True)
+
+        return batch_output_dict
+
+
 def audio_tagging(args):
     """Inference audio tagging result of an audio clip.
     """
@@ -56,18 +90,7 @@ def audio_tagging(args):
     waveform = waveform[None, :]    # (1, audio_length)
     waveform = move_data_to_device(waveform, device)
 
-    # Forward
-    with torch.no_grad():
-        model.eval()
-        batch_output_dict = model(waveform, None)
-        if onnx_export is not None:
-            print("Export ONNX to: %s" % onnx_export)
-            torch.onnx.export(
-                model, waveform, onnx_export,
-                verbose=True,
-                export_params=True,
-                opset_version=11,
-                do_constant_folding=True)
+    batch_output_dict = eval_model(model, waveform, onnx_export)
 
     clipwise_output = batch_output_dict['clipwise_output'].data.cpu().numpy()[0]
     """(classes_num,)"""
@@ -134,18 +157,7 @@ def sound_event_detection(args):
     waveform = waveform[None, :]    # (1, audio_length)
     waveform = move_data_to_device(waveform, device)
 
-    # Forward
-    with torch.no_grad():
-        model.eval()
-        batch_output_dict = model(waveform, None)
-        if onnx_export is not None:
-            print("Export ONNX to: %s" % onnx_export)
-            torch.onnx.export(
-                model, waveform, onnx_export,
-                verbose=True,
-                export_params=True,
-                opset_version=11,
-                do_constant_folding=True)
+    batch_output_dict = eval_model(model, waveform, onnx_export)
 
     framewise_output = batch_output_dict['framewise_output'].data.cpu().numpy()[0]
     """(time_steps, classes_num)"""

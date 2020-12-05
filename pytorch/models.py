@@ -137,6 +137,7 @@ class AttBlock(nn.Module):
 
 
 class Cnn14(nn.Module):
+
     def __init__(self, sample_rate, window_size, hop_size, mel_bins, fmin, 
         fmax, classes_num):
         
@@ -182,12 +183,21 @@ class Cnn14(nn.Module):
         init_layer(self.fc1)
         init_layer(self.fc_audioset)
  
+    def prepare(self, input, mixup_lambda=None):
+        """
+        Input: (batch_size, data_length)"""
+        x = self.spectrogram_extractor(input)   # (batch_size, 1, time_steps, freq_bins)
+        x = self.logmel_extractor(x)    # (batch_size, 1, time_steps, mel_bins)
+        return x
+
     def forward(self, input, mixup_lambda=None):
         """
         Input: (batch_size, data_length)"""
 
-        x = self.spectrogram_extractor(input)   # (batch_size, 1, time_steps, freq_bins)
-        x = self.logmel_extractor(x)    # (batch_size, 1, time_steps, mel_bins)
+        # x = self.prepare(input)
+        x = input
+        # x = self.spectrogram_extractor(input)   # (batch_size, 1, time_steps, freq_bins)
+        # x = self.logmel_extractor(x)    # (batch_size, 1, time_steps, mel_bins)
 
         x = x.transpose(1, 3)
         x = self.bn0(x)
@@ -2366,7 +2376,7 @@ class Wavegram_Logmel_Cnn14(nn.Module):
         init_layer(self.fc1)
         init_layer(self.fc_audioset)
  
-    def forward(self, input, mixup_lambda=None):
+    def prepare(self, input, mixup_lambda=None):
         """
         Input: (batch_size, data_length)"""
 
@@ -2381,7 +2391,16 @@ class Wavegram_Logmel_Cnn14(nn.Module):
         # Log mel spectrogram
         x = self.spectrogram_extractor(input)   # (batch_size, 1, time_steps, freq_bins)
         x = self.logmel_extractor(x)    # (batch_size, 1, time_steps, mel_bins)
-        
+
+        return (a1, x)
+
+    def forward(self, input, hidden, mixup_lambda=None):
+        """
+        Input: (batch_size, data_length)"""
+
+        (a1, x) = (input, hidden)
+        # (a1, x) = self.prepare(input)
+
         x = x.transpose(1, 3)
         x = self.bn0(x)
         x = x.transpose(1, 3)
