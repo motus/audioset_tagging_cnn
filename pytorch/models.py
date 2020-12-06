@@ -182,7 +182,7 @@ class Cnn14(nn.Module):
         init_bn(self.bn0)
         init_layer(self.fc1)
         init_layer(self.fc_audioset)
- 
+
     def prepare(self, input, mixup_lambda=None):
         """
         Input: (batch_size, data_length)"""
@@ -450,12 +450,21 @@ class Cnn6(nn.Module):
         init_layer(self.fc1)
         init_layer(self.fc_audioset)
  
+    def prepare(self, input, mixup_lambda=None):
+        """
+        Input: (batch_size, data_length)"""
+        x = self.spectrogram_extractor(input)   # (batch_size, 1, time_steps, freq_bins)
+        x = self.logmel_extractor(x)    # (batch_size, 1, time_steps, mel_bins)
+        return x
+
     def forward(self, input, mixup_lambda=None):
         """
         Input: (batch_size, data_length)"""
 
-        x = self.spectrogram_extractor(input)   # (batch_size, 1, time_steps, freq_bins)
-        x = self.logmel_extractor(x)    # (batch_size, 1, time_steps, mel_bins)
+        # x = self.prepare(input)
+        x = input
+        # x = self.spectrogram_extractor(input)   # (batch_size, 1, time_steps, freq_bins)
+        # x = self.logmel_extractor(x)    # (batch_size, 1, time_steps, mel_bins)
         
         x = x.transpose(1, 3)
         x = self.bn0(x)
@@ -535,13 +544,22 @@ class Cnn10(nn.Module):
         init_layer(self.fc1)
         init_layer(self.fc_audioset)
  
+    def prepare(self, input, mixup_lambda=None):
+        """
+        Input: (batch_size, data_length)"""
+        x = self.spectrogram_extractor(input)   # (batch_size, 1, time_steps, freq_bins)
+        x = self.logmel_extractor(x)    # (batch_size, 1, time_steps, mel_bins)
+        return x
+
     def forward(self, input, mixup_lambda=None):
         """
         Input: (batch_size, data_length)"""
 
-        x = self.spectrogram_extractor(input)   # (batch_size, 1, time_steps, freq_bins)
-        x = self.logmel_extractor(x)    # (batch_size, 1, time_steps, mel_bins)
-        
+        # x = self.prepare(input)
+        x = input
+        # x = self.spectrogram_extractor(input)   # (batch_size, 1, time_steps, freq_bins)
+        # x = self.logmel_extractor(x)    # (batch_size, 1, time_steps, mel_bins)
+
         x = x.transpose(1, 3)
         x = self.bn0(x)
         x = x.transpose(1, 3)
@@ -824,14 +842,22 @@ class ResNet22(nn.Module):
         init_layer(self.fc1)
         init_layer(self.fc_audioset)
 
+    def prepare(self, input, mixup_lambda=None):
+        """
+        Input: (batch_size, data_length)"""
+        x = self.spectrogram_extractor(input)   # (batch_size, 1, time_steps, freq_bins)
+        x = self.logmel_extractor(x)    # (batch_size, 1, time_steps, mel_bins)
+        return x
 
     def forward(self, input, mixup_lambda=None):
         """
         Input: (batch_size, data_length)"""
 
-        x = self.spectrogram_extractor(input)   # (batch_size, 1, time_steps, freq_bins)
-        x = self.logmel_extractor(x)    # (batch_size, 1, time_steps, mel_bins)
-        
+        # x = self.prepare(input)
+        x = input
+        # x = self.spectrogram_extractor(input)   # (batch_size, 1, time_steps, freq_bins)
+        # x = self.logmel_extractor(x)    # (batch_size, 1, time_steps, mel_bins)
+
         x = x.transpose(1, 3)
         x = self.bn0(x)
         x = x.transpose(1, 3)
@@ -911,14 +937,22 @@ class ResNet38(nn.Module):
         init_layer(self.fc1)
         init_layer(self.fc_audioset)
 
+    def prepare(self, input, mixup_lambda=None):
+        """
+        Input: (batch_size, data_length)"""
+        x = self.spectrogram_extractor(input)   # (batch_size, 1, time_steps, freq_bins)
+        x = self.logmel_extractor(x)    # (batch_size, 1, time_steps, mel_bins)
+        return x
 
     def forward(self, input, mixup_lambda=None):
         """
         Input: (batch_size, data_length)"""
 
-        x = self.spectrogram_extractor(input)   # (batch_size, 1, time_steps, freq_bins)
-        x = self.logmel_extractor(x)    # (batch_size, 1, time_steps, mel_bins)
-        
+        # x = self.prepare(input)
+        x = input
+        # x = self.spectrogram_extractor(input)   # (batch_size, 1, time_steps, freq_bins)
+        # x = self.logmel_extractor(x)    # (batch_size, 1, time_steps, mel_bins)
+
         x = x.transpose(1, 3)
         x = self.bn0(x)
         x = x.transpose(1, 3)
@@ -998,14 +1032,22 @@ class ResNet54(nn.Module):
         init_layer(self.fc1)
         init_layer(self.fc_audioset)
 
+    def prepare(self, input, mixup_lambda=None):
+        """
+        Input: (batch_size, data_length)"""
+        x = self.spectrogram_extractor(input)   # (batch_size, 1, time_steps, freq_bins)
+        x = self.logmel_extractor(x)    # (batch_size, 1, time_steps, mel_bins)
+        return x
 
     def forward(self, input, mixup_lambda=None):
         """
         Input: (batch_size, data_length)"""
 
-        x = self.spectrogram_extractor(input)   # (batch_size, 1, time_steps, freq_bins)
-        x = self.logmel_extractor(x)    # (batch_size, 1, time_steps, mel_bins)
-        
+        # x = self.prepare(input)
+        x = input
+        # x = self.spectrogram_extractor(input)   # (batch_size, 1, time_steps, freq_bins)
+        # x = self.logmel_extractor(x)    # (batch_size, 1, time_steps, mel_bins)
+
         x = x.transpose(1, 3)
         x = self.bn0(x)
         x = x.transpose(1, 3)
@@ -1085,13 +1127,22 @@ class Cnn14_emb512(nn.Module):
         init_layer(self.fc1)
         init_layer(self.fc_audioset)
  
+    def prepare(self, input, mixup_lambda=None):
+        """
+        Input: (batch_size, data_length)"""
+        x = self.spectrogram_extractor(input)   # (batch_size, 1, time_steps, freq_bins)
+        x = self.logmel_extractor(x)    # (batch_size, 1, time_steps, mel_bins)
+        return x
+
     def forward(self, input, mixup_lambda=None):
         """
         Input: (batch_size, data_length)"""
 
-        x = self.spectrogram_extractor(input)   # (batch_size, 1, time_steps, freq_bins)
-        x = self.logmel_extractor(x)    # (batch_size, 1, time_steps, mel_bins)
-        
+        # x = self.prepare(input)
+        x = input
+        # x = self.spectrogram_extractor(input)   # (batch_size, 1, time_steps, freq_bins)
+        # x = self.logmel_extractor(x)    # (batch_size, 1, time_steps, mel_bins)
+
         x = x.transpose(1, 3)
         x = self.bn0(x)
         x = x.transpose(1, 3)
@@ -1176,13 +1227,22 @@ class Cnn14_emb128(nn.Module):
         init_layer(self.fc1)
         init_layer(self.fc_audioset)
  
+    def prepare(self, input, mixup_lambda=None):
+        """
+        Input: (batch_size, data_length)"""
+        x = self.spectrogram_extractor(input)   # (batch_size, 1, time_steps, freq_bins)
+        x = self.logmel_extractor(x)    # (batch_size, 1, time_steps, mel_bins)
+        return x
+
     def forward(self, input, mixup_lambda=None):
         """
         Input: (batch_size, data_length)"""
 
-        x = self.spectrogram_extractor(input)   # (batch_size, 1, time_steps, freq_bins)
-        x = self.logmel_extractor(x)    # (batch_size, 1, time_steps, mel_bins)
-        
+        # x = self.prepare(input)
+        x = input
+        # x = self.spectrogram_extractor(input)   # (batch_size, 1, time_steps, freq_bins)
+        # x = self.logmel_extractor(x)    # (batch_size, 1, time_steps, mel_bins)
+
         x = x.transpose(1, 3)
         x = self.bn0(x)
         x = x.transpose(1, 3)
@@ -1267,13 +1327,22 @@ class Cnn14_emb32(nn.Module):
         init_layer(self.fc1)
         init_layer(self.fc_audioset)
  
+    def prepare(self, input, mixup_lambda=None):
+        """
+        Input: (batch_size, data_length)"""
+        x = self.spectrogram_extractor(input)   # (batch_size, 1, time_steps, freq_bins)
+        x = self.logmel_extractor(x)    # (batch_size, 1, time_steps, mel_bins)
+        return x
+
     def forward(self, input, mixup_lambda=None):
         """
         Input: (batch_size, data_length)"""
 
-        x = self.spectrogram_extractor(input)   # (batch_size, 1, time_steps, freq_bins)
-        x = self.logmel_extractor(x)    # (batch_size, 1, time_steps, mel_bins)
-        
+        # x = self.prepare(input)
+        x = input
+        # x = self.spectrogram_extractor(input)   # (batch_size, 1, time_steps, freq_bins)
+        # x = self.logmel_extractor(x)    # (batch_size, 1, time_steps, mel_bins)
+
         x = x.transpose(1, 3)
         x = self.bn0(x)
         x = x.transpose(1, 3)
@@ -1396,13 +1465,22 @@ class MobileNetV1(nn.Module):
         init_layer(self.fc1)
         init_layer(self.fc_audioset)
  
+    def prepare(self, input, mixup_lambda=None):
+        """
+        Input: (batch_size, data_length)"""
+        x = self.spectrogram_extractor(input)   # (batch_size, 1, time_steps, freq_bins)
+        x = self.logmel_extractor(x)    # (batch_size, 1, time_steps, mel_bins)
+        return x
+
     def forward(self, input, mixup_lambda=None):
         """
         Input: (batch_size, data_length)"""
 
-        x = self.spectrogram_extractor(input)   # (batch_size, 1, time_steps, freq_bins)
-        x = self.logmel_extractor(x)    # (batch_size, 1, time_steps, mel_bins)
-        
+        # x = self.prepare(input)
+        x = input
+        # x = self.spectrogram_extractor(input)   # (batch_size, 1, time_steps, freq_bins)
+        # x = self.logmel_extractor(x)    # (batch_size, 1, time_steps, mel_bins)
+
         x = x.transpose(1, 3)
         x = self.bn0(x)
         x = x.transpose(1, 3)
@@ -1576,14 +1654,23 @@ class MobileNetV2(nn.Module):
         init_bn(self.bn0)
         init_layer(self.fc1)
         init_layer(self.fc_audioset)
- 
+
+    def prepare(self, input, mixup_lambda=None):
+        """
+        Input: (batch_size, data_length)"""
+        x = self.spectrogram_extractor(input)   # (batch_size, 1, time_steps, freq_bins)
+        x = self.logmel_extractor(x)    # (batch_size, 1, time_steps, mel_bins)
+        return x
+
     def forward(self, input, mixup_lambda=None):
         """
         Input: (batch_size, data_length)"""
 
-        x = self.spectrogram_extractor(input)   # (batch_size, 1, time_steps, freq_bins)
-        x = self.logmel_extractor(x)    # (batch_size, 1, time_steps, mel_bins)
-        
+        # x = self.prepare(input)
+        x = input
+        # x = self.spectrogram_extractor(input)   # (batch_size, 1, time_steps, freq_bins)
+        # x = self.logmel_extractor(x)    # (batch_size, 1, time_steps, mel_bins)
+
         x = x.transpose(1, 3)
         x = self.bn0(x)
         x = x.transpose(1, 3)
@@ -3075,12 +3162,21 @@ class Cnn14_DecisionLevelMax(nn.Module):
         init_layer(self.fc1)
         init_layer(self.fc_audioset)
  
+    def prepare(self, input, mixup_lambda=None):
+        """
+        Input: (batch_size, data_length)"""
+        x = self.spectrogram_extractor(input)   # (batch_size, 1, time_steps, freq_bins)
+        x = self.logmel_extractor(x)    # (batch_size, 1, time_steps, mel_bins)
+        return x
+
     def forward(self, input, mixup_lambda=None):
         """
         Input: (batch_size, data_length)"""
 
-        x = self.spectrogram_extractor(input)   # (batch_size, 1, time_steps, freq_bins)
-        x = self.logmel_extractor(x)    # (batch_size, 1, time_steps, mel_bins)
+        # x = self.prepare(input)
+        x = input
+        # x = self.spectrogram_extractor(input)   # (batch_size, 1, time_steps, freq_bins)
+        # x = self.logmel_extractor(x)    # (batch_size, 1, time_steps, mel_bins)
 
         frames_num = x.shape[2]
         
@@ -3280,12 +3376,21 @@ class Cnn14_DecisionLevelAtt(nn.Module):
         init_bn(self.bn0)
         init_layer(self.fc1)
  
+    def prepare(self, input, mixup_lambda=None):
+        """
+        Input: (batch_size, data_length)"""
+        x = self.spectrogram_extractor(input)   # (batch_size, 1, time_steps, freq_bins)
+        x = self.logmel_extractor(x)    # (batch_size, 1, time_steps, mel_bins)
+        return x
+
     def forward(self, input, mixup_lambda=None):
         """
         Input: (batch_size, data_length)"""
 
-        x = self.spectrogram_extractor(input)   # (batch_size, 1, time_steps, freq_bins)
-        x = self.logmel_extractor(x)    # (batch_size, 1, time_steps, mel_bins)
+        # x = self.prepare(input)
+        x = input
+        # x = self.spectrogram_extractor(input)   # (batch_size, 1, time_steps, freq_bins)
+        # x = self.logmel_extractor(x)    # (batch_size, 1, time_steps, mel_bins)
 
         frames_num = x.shape[2]
         
