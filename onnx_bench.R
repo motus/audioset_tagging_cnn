@@ -29,7 +29,7 @@ png("onnx_size.png", height=1024, width=1600, res=220)
 
 ggplot(data, aes(x=model, y=size/1024/1024, fill=type)) +
   geom_bar(stat="identity", na.rm=T, alpha=0.9, color="black") +
-  geom_text(label=round(data$size/1024/1024, 1), nudge_y=12, alpha=0.9, size=2.3) +
+  geom_text(label=round(data$size/1024/1024, 1), nudge_y=10, alpha=0.9, size=2.3) +
   scale_x_discrete("Model") +
   scale_y_continuous("Model size, MB") +
   scale_fill_brewer(palette="Set3") +
