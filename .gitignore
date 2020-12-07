@@ -8,4 +8,5 @@ __pycache__
 _logs
 *.pth
 *.onnx
+*.png
 paper_statistics
