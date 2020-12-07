@@ -9,4 +9,5 @@ _logs
 *.pth
 *.onnx
 *.png
+.R*
 paper_statistics
