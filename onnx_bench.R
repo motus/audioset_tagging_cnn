@@ -38,3 +38,17 @@ ggplot(data, aes(x=model, y=size/1024/1024, fill=type)) +
   theme(legend.position="right", axis.text.x=element_text(angle=30, hjust=1))
 
 dev.off()
+
+png("onnx_mAP.png", height=1024, width=1600, res=220)
+
+ggplot(data, aes(x=model, y=mAP, fill=type)) +
+  geom_bar(stat="identity", na.rm=T, alpha=0.9, color="black") +
+  geom_text(label=data$mAP, nudge_y=0.01, alpha=0.9, size=2.3) +
+  scale_x_discrete("Model") +
+  scale_y_continuous("mAP") +
+  scale_fill_brewer(palette="Set3") +
+  labs(title="Mean Average Precision", fill="Model Type") +
+  theme_bw() +
+  theme(legend.position="right", axis.text.x=element_text(angle=30, hjust=1))
+
+dev.off()
