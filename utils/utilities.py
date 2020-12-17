@@ -17,7 +17,7 @@ def create_folder(fd):
         
 def get_filename(path):
     path = os.path.realpath(path)
-    na_ext = path.split('/')[-1]
+    na_ext = os.path.basename(path)
     na = os.path.splitext(na_ext)[0]
     return na
 
@@ -56,7 +56,7 @@ def create_logging(log_dir, filemode):
     return logging
 
 
-def read_metadata(csv_path, classes_num, id_to_ix):
+def read_metadata(csv_path, classes_num, id_to_ix, prepend_y=True):
     """Read metadata of AudioSet from a csv file.
 
     Args:
@@ -78,7 +78,8 @@ def read_metadata(csv_path, classes_num, id_to_ix):
         items = line.split(', ')
         """items: ['--4gqARaEJE', '0.000', '10.000', '"/m/068hy,/m/07q6cd_,/m/0bt9lr,/m/0jbk"\n']"""
 
-        audio_name = 'Y{}.wav'.format(items[0])   # Audios are started with an extra 'Y' when downloading
+        # Audios are started with an extra 'Y' when downloading
+        audio_name = '{}{}.wav'.format("Y" if prepend_y else "", items[0])
         label_ids = items[3].split('"')[1].split(',')
 
         audio_names.append(audio_name)

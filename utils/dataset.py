@@ -132,6 +132,7 @@ def pack_waveforms_to_hdf5(args):
     csv_path = args.csv_path
     waveforms_hdf5_path = args.waveforms_hdf5_path
     mini_data = args.mini_data
+    prepend_y = not args.no_prepend_y
 
     clip_samples = config.clip_samples
     classes_num = config.classes_num
@@ -153,7 +154,7 @@ def pack_waveforms_to_hdf5(args):
     logging.info('Write logs to {}'.format(logs_dir))
     
     # Read csv file
-    meta_dict = read_metadata(csv_path, classes_num, id_to_ix)
+    meta_dict = read_metadata(csv_path, classes_num, id_to_ix, prepend_y)
 
     if mini_data:
         mini_num = 10
@@ -208,6 +209,7 @@ if __name__ == '__main__':
     parser_pack_wavs.add_argument('--audios_dir', type=str, required=True, help='Directory to save out downloaded audio.')
     parser_pack_wavs.add_argument('--waveforms_hdf5_path', type=str, required=True, help='Path to save out packed hdf5.')
     parser_pack_wavs.add_argument('--mini_data', action='store_true', default=False, help='Set true to only download 10 audios for debugging.')
+    parser_pack_wavs.add_argument('--no_prepend_y', action='store_true', default=False, help='Set true if audio files have "Y" prepended to each file name.')
 
     args = parser.parse_args()
     
