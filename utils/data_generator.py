@@ -188,7 +188,7 @@ class BalancedTrainSampler(Base):
             batch_size, black_list_csv, random_seed)
         
         self.samples_num_per_class = np.sum(self.targets, axis=0)
-        logging.info('samples_num_per_class: {}'.format(
+        logging.info('samples_num_per_class:\n{}'.format(
             self.samples_num_per_class.astype(np.int32)))
         
         # Training indexes of all sound classes. E.g.: 
@@ -231,6 +231,12 @@ class BalancedTrainSampler(Base):
 
                 class_id = self.queue.pop(0)
                 pointer = self.pointers_of_classes[class_id]
+
+                if class_id >= len(self.indexes_per_class) \
+                        or pointer >= len(self.indexes_per_class[class_id]):
+                    logging.debug("No data for class %d at %d", class_id, pointer)
+                    continue
+
                 self.pointers_of_classes[class_id] += 1
                 index = self.indexes_per_class[class_id][pointer]
                 
