@@ -9,13 +9,16 @@ with open('metadata/class_labels_indices.csv', 'r') as f:
     reader = csv.reader(f, delimiter=',')
     lines = list(reader)
 
-labels = []
-ids = []    # Each label has a unique id such as "/m/068hy"
-for i1 in range(1, len(lines)):
-    id = lines[i1][1]
-    label = lines[i1][2]
-    ids.append(id)
-    labels.append(label)
+# labels = []
+# ids = []    # Each label has a unique id such as "/m/068hy"
+# for i1 in range(1, len(lines)):
+#     id = lines[i1][1]
+#     label = lines[i1][2]
+#     ids.append(id)
+#     labels.append(label)
+
+labels = ["/m/04rlf"]  # Music only
+ids = [137]
 
 classes_num = len(labels)
 
