@@ -68,6 +68,8 @@ def train(args):
     learning_rate = args.learning_rate
     resume_iteration = args.resume_iteration
     early_stop = args.early_stop
+    checkpoint_rate = args.checkpoint_rate
+    evaluation_rate = args.evaluation_rate
     device = torch.device('cuda') if args.cuda and torch.cuda.is_available() else torch.device('cpu')
     filename = args.filename
 
@@ -223,7 +225,7 @@ def train(args):
         """
         
         # Evaluate
-        if (iteration % 2000 == 0 and iteration > resume_iteration) or (iteration == 0):
+        if (iteration % evaluation_rate == 0 and iteration > resume_iteration) or (iteration == 0):
             train_fin_time = time.time()
 
             bal_statistics = evaluator.evaluate(eval_bal_loader)
@@ -251,7 +253,7 @@ def train(args):
             train_bgn_time = time.time()
         
         # Save model
-        if iteration % 100000 == 0:
+        if iteration % checkpoint_rate == 0:
             checkpoint = {
                 'iteration': iteration, 
                 'model': model.module.state_dict(), 
@@ -334,6 +336,8 @@ if __name__ == '__main__':
     parser_train.add_argument('--learning_rate', type=float, default=1e-3)
     parser_train.add_argument('--resume_iteration', type=int, default=0)
     parser_train.add_argument('--early_stop', type=int, default=1000000)
+    parser_train.add_argument('--checkpoint_rate', type=int, default=100000)
+    parser_train.add_argument('--evaluation_rate', type=int, default=2000)
     parser_train.add_argument('--cuda', action='store_true', default=False)
     
     args = parser.parse_args()
