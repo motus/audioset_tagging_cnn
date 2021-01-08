@@ -86,8 +86,9 @@ def read_metadata(csv_path, classes_num, id_to_ix, prepend_y=True):
 
         # Target
         for id in label_ids:
-            ix = id_to_ix[id]
-            targets[n, ix] = 1
+            ix = id_to_ix.get(id)  # Allow unknown labels
+            if ix is not None:
+                targets[n, ix] = 1
     
     meta_dict = {'audio_name': np.array(audio_names), 'target': targets}
     return meta_dict
