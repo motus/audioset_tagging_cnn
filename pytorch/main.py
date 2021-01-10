@@ -277,20 +277,25 @@ def train(args):
         # Forward
         model.train()
 
-        if 'mixup' in augmentation:
-            batch_output_dict = model(batch_data_dict['waveform'], 
-                batch_data_dict['mixup_lambda'])
-            """{'clipwise_output': (batch_size, classes_num), ...}"""
+        mixup_data = batch_data_dict['mixup_lambda'] if 'mixup' in augmentation else None
 
+        if 'prepare' in dir(model):
+            features = model.prepare(batch_data_dict['waveform'], mixup_data)
+        else:
+            features = batch_data_dict['waveform']
+
+        """ batch_output_dict = {'clipwise_output': (batch_size, classes_num), ...}"""
+        if isinstance(features, tuple):
+            batch_output_dict = model(*features, mixup_data)
+        else:
+            batch_output_dict = model(features, mixup_data)
+
+        """batch_target_dict = {'target': (batch_size, classes_num)}"""
+        if 'mixup' in augmentation:
             batch_target_dict = {'target': do_mixup(batch_data_dict['target'], 
                 batch_data_dict['mixup_lambda'])}
-            """{'target': (batch_size, classes_num)}"""
         else:
-            batch_output_dict = model(batch_data_dict['waveform'], None)
-            """{'clipwise_output': (batch_size, classes_num), ...}"""
-
             batch_target_dict = {'target': batch_data_dict['target']}
-            """{'target': (batch_size, classes_num)}"""
 
         # Loss
         loss = loss_func(batch_output_dict, batch_target_dict)

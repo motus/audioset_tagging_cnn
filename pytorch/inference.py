@@ -20,7 +20,6 @@ def eval_model(model, waveform, onnx_export=None):
 
         model.eval()
 
-        hidden = None
         if 'prepare' in dir(model):
             features_etc = model.prepare(waveform)
         else:
@@ -30,7 +29,7 @@ def eval_model(model, waveform, onnx_export=None):
             (features, hidden) = features_etc
             batch_output_dict = model(features, hidden, None)
         else:
-            features = features_etc
+            (features, hidden) = (features_etc, None)
             batch_output_dict = model(features, None)
 
         if onnx_export is not None:
