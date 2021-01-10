@@ -35,8 +35,9 @@ class Evaluator(object):
         average_precision = metrics.average_precision_score(
             target, clipwise_output, average=None)
 
-        auc = metrics.roc_auc_score(target, clipwise_output, average=None)
-        
-        statistics = {'average_precision': average_precision, 'auc': auc}
+        statistics = {'average_precision': average_precision}
+
+        if target.shape[1] > 1:
+            statistics['auc'] = metrics.roc_auc_score(target, clipwise_output, average=None)
 
         return statistics
