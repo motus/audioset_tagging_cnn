@@ -1470,7 +1470,7 @@ class MobileNetV1(nn.Module):
         Input: (batch_size, data_length)"""
         x = self.spectrogram_extractor(input)   # (batch_size, 1, time_steps, freq_bins)
         x = self.logmel_extractor(x)    # (batch_size, 1, time_steps, mel_bins)
-        return x
+        return (x,)
 
     def forward(self, input, mixup_lambda=None):
         """

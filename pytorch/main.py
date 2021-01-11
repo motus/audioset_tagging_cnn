@@ -277,22 +277,15 @@ def train(args):
         # Forward
         model.train()
 
-        mixup_data = batch_data_dict['mixup_lambda'] if 'mixup' in augmentation else None
-
-        if 'prepare' in dir(model):
-            features = model.prepare(batch_data_dict['waveform'], mixup_data)
-        else:
-            features = batch_data_dict['waveform']
+        mixup = batch_data_dict['mixup_lambda'] if 'mixup' in augmentation else None
+        features = model.prepare(batch_data_dict['waveform'], mixup_lambda=mixup)
 
         """ batch_output_dict = {'clipwise_output': (batch_size, classes_num), ...}"""
-        if isinstance(features, tuple):
-            batch_output_dict = model(*features, mixup_data)
-        else:
-            batch_output_dict = model(features, mixup_data)
+        batch_output_dict = model(*features, mixup_lambda=mixup)
 
         """batch_target_dict = {'target': (batch_size, classes_num)}"""
         if 'mixup' in augmentation:
-            batch_target_dict = {'target': do_mixup(batch_data_dict['target'], 
+            batch_target_dict = {'target': do_mixup(batch_data_dict['target'],
                 batch_data_dict['mixup_lambda'])}
         else:
             batch_target_dict = {'target': batch_data_dict['target']}

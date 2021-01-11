@@ -64,21 +64,12 @@ def forward(model, generator, return_input=False,
     for n, batch_data_dict in enumerate(generator):
         print(n)
         batch_waveform = move_data_to_device(batch_data_dict['waveform'], device)
-        
+
         with torch.no_grad():
             model.eval()
             # batch_output = model(batch_waveform)
-            hidden = None
-            if 'prepare' in dir(model):
-                features_etc = model.prepare(batch_waveform)
-            else:
-                features_etc = batch_waveform
-            if isinstance(features_etc, tuple):
-                (features, hidden) = features_etc
-                batch_output = model(features, hidden, None)
-            else:
-                features = features_etc
-                batch_output = model(features, None)
+            features = model.prepare(batch_waveform)
+            batch_output = model(*features)
 
         append_to_dict(output_dict, 'audio_name', batch_data_dict['audio_name'])
 

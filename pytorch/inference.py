@@ -20,23 +20,14 @@ def eval_model(model, waveform, onnx_export=None):
 
         model.eval()
 
-        if 'prepare' in dir(model):
-            features_etc = model.prepare(waveform)
-        else:
-            features_etc = waveform
-
-        if isinstance(features_etc, tuple):
-            (features, hidden) = features_etc
-            batch_output_dict = model(features, hidden, None)
-        else:
-            (features, hidden) = (features_etc, None)
-            batch_output_dict = model(features, None)
+        features = model.prepare(waveform)
+        batch_output_dict = model(*features)
 
         if onnx_export is not None:
             print("Export ONNX to: %s" % onnx_export)
             torch.onnx.export(
                 model,
-                features if hidden is None else (features, hidden),
+                features,
                 onnx_export,
                 verbose=True,
                 export_params=True,
