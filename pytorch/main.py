@@ -125,13 +125,13 @@ def train(args):
         device = 'cpu'
     
     # Model
-    Model = eval(model_type)
-    model = Model(sample_rate=sample_rate, window_size=window_size, 
+    ModelClass = eval(model_type)
+    model_orig = ModelClass(sample_rate=sample_rate, window_size=window_size,
         hop_size=hop_size, mel_bins=mel_bins, fmin=fmin, fmax=fmax, 
         classes_num=classes_num)
      
-    params_num = count_parameters(model)
-    # flops_num = count_flops(model, clip_samples)
+    params_num = count_parameters(model_orig)
+    # flops_num = count_flops(model_orig, clip_samples)
     logging.info('Parameters num: {}'.format(params_num))
     # logging.info('Flops num: {:.3f} G'.format(flops_num / 1e9))
     
@@ -176,13 +176,13 @@ def train(args):
         mixup_augmenter = Mixup(mixup_alpha=1.)
 
     # Evaluator
-    evaluator = Evaluator(model=model)
+    evaluator = Evaluator(model=model_orig)
         
     # Statistics
     statistics_container = StatisticsContainer(statistics_path)
     
     # Optimizer
-    optimizer = optim.Adam(model.parameters(), lr=learning_rate, 
+    optimizer = optim.Adam(model_orig.parameters(), lr=learning_rate,
         betas=(0.9, 0.999), eps=1e-08, weight_decay=0., amsgrad=True)
 
     train_bgn_time = time.time()
@@ -199,7 +199,7 @@ def train(args):
 
         logging.info('Loading checkpoint {}'.format(resume_checkpoint_path))
         checkpoint = torch.load(resume_checkpoint_path)
-        model.load_state_dict(checkpoint['model'])
+        model_orig.load_state_dict(checkpoint['model'])
         train_sampler.load_state_dict(checkpoint['sampler'])
         statistics_container.load_state_dict(resume_iteration)
         iteration = checkpoint['iteration']
@@ -209,7 +209,7 @@ def train(args):
     
     # Parallel
     print('GPU number: {}'.format(torch.cuda.device_count()))
-    model = torch.nn.DataParallel(model)
+    model = torch.nn.DataParallel(model_orig)
 
     if 'cuda' in str(device):
         model.to(device)
@@ -278,7 +278,7 @@ def train(args):
         model.train()
 
         mixup = batch_data_dict['mixup_lambda'] if 'mixup' in augmentation else None
-        features = model.prepare(batch_data_dict['waveform'], mixup_lambda=mixup)
+        features = model_orig.prepare(batch_data_dict['waveform'], mixup_lambda=mixup)
 
         """ batch_output_dict = {'clipwise_output': (batch_size, classes_num), ...}"""
         batch_output_dict = model(*features, mixup_lambda=mixup)
