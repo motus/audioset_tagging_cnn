@@ -1660,7 +1660,7 @@ class MobileNetV2(nn.Module):
         Input: (batch_size, data_length)"""
         x = self.spectrogram_extractor(input)   # (batch_size, 1, time_steps, freq_bins)
         x = self.logmel_extractor(x)    # (batch_size, 1, time_steps, mel_bins)
-        return x
+        return (x,)
 
     def forward(self, input, mixup_lambda=None):
         """
@@ -1757,6 +1757,11 @@ class LeeNet11(nn.Module):
         init_layer(self.fc1)
         init_layer(self.fc_audioset)
  
+    def prepare(self, input, mixup_lambda=None):
+        """
+        Input: (batch_size, data_length)"""
+        return (input,)
+
     def forward(self, input, mixup_lambda=None):
         """
         Input: (batch_size, data_length)"""
@@ -1855,7 +1860,12 @@ class LeeNet24(nn.Module):
     def init_weight(self):
         init_layer(self.fc1)
         init_layer(self.fc_audioset)
- 
+
+    def prepare(self, input, mixup_lambda=None):
+        """
+        Input: (batch_size, data_length)"""
+        return (input,)
+
     def forward(self, input, mixup_lambda=None):
         """
         Input: (batch_size, data_length)"""
