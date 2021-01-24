@@ -80,7 +80,7 @@ def read_metadata(csv_path, classes_num, id_to_ix, prepend_y=True):
 
         # Audios are started with an extra 'Y' when downloading
         audio_name = '{}{}.wav'.format("Y" if prepend_y else "", items[0].strip())
-        label_ids = items[3].strip().strip('"').split(',')
+        label_ids = items[3].strip(' "').split(',')
 
         audio_names.append(audio_name)
 
