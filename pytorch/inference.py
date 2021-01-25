@@ -48,10 +48,10 @@ def audio_tagging(args):
     # Parallel
     if 'cuda' in str(device):
         model.to(device)
-        print('* GPU number: {}'.format(torch.cuda.device_count()))
+        print('# GPU number: {}'.format(torch.cuda.device_count()))
         model = torch.nn.DataParallel(model)
     else:
-        print('* Using CPU.')
+        print('# Using CPU.')
         pass
 
     if print_csv:
@@ -59,7 +59,7 @@ def audio_tagging(args):
 
     for fname in glob.glob(audio_path):
 
-        print("* Inference for:", fname)
+        print("# Inference for:", fname)
 
         # Load audio
         (waveform, _) = librosa.core.load(fname, sr=sample_rate_data, mono=True)
@@ -82,13 +82,13 @@ def audio_tagging(args):
 
             # Print audio tagging top probabilities
             for k in range(10):
-                print('* {}: {:.3f}'.format(np.array(labels)[sorted_indexes[k]],
+                print('# - {}: {:.3f}'.format(np.array(labels)[sorted_indexes[k]],
                     clipwise_output[sorted_indexes[k]]))
 
             # Print embedding
             if 'embedding' in batch_output_dict.keys():
                 embedding = batch_output_dict['embedding'].data.cpu().numpy()[0]
-                print('* embedding: {}'.format(embedding.shape))
+                print('# = embedding: {}'.format(embedding.shape))
 
     return clipwise_output, labels
 
