@@ -187,8 +187,8 @@ if __name__ == '__main__':
     parser_at.add_argument('--cuda', action='store_true', default=False)
 
     parser_sed = subparsers.add_parser('sound_event_detection')
-    parser_at.add_argument('--sample_rate_model', type=int, default=32000)
-    parser_at.add_argument('--sample_rate_data', type=int, default=32000)
+    parser_sed.add_argument('--sample_rate_model', type=int, default=32000)
+    parser_sed.add_argument('--sample_rate_data', type=int, default=32000)
     parser_sed.add_argument('--window_size', type=int, default=1024)
     parser_sed.add_argument('--hop_size', type=int, default=320)
     parser_sed.add_argument('--mel_bins', type=int, default=64)
