@@ -68,7 +68,8 @@ def read_metadata(csv_path, classes_num, id_to_ix, prepend_y=True):
 
     with open(csv_path, 'r') as fr:
         lines = fr.readlines()
-        lines = lines[3:]   # Remove heads
+        while lines[0].startswith('#'):
+            lines = lines[1:]   # Remove heads
 
     audios_num = len(lines)
     targets = np.zeros((audios_num, classes_num), dtype=np.bool)
