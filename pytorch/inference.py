@@ -18,7 +18,8 @@ def audio_tagging(args):
     """
 
     # Arugments & parameters
-    sample_rate = args.sample_rate
+    sample_rate_model = args.sample_rate_model
+    sample_rate_data = args.sample_rate_data
     window_size = args.window_size
     hop_size = args.hop_size
     mel_bins = args.mel_bins
@@ -28,16 +29,16 @@ def audio_tagging(args):
     checkpoint_path = args.checkpoint_path
     audio_path = args.audio_path
     device = torch.device('cuda') if args.cuda and torch.cuda.is_available() else torch.device('cpu')
-    
+
     classes_num = config.classes_num
     labels = config.labels
 
     # Model
     Model = eval(model_type)
-    model = Model(sample_rate=sample_rate, window_size=window_size, 
-        hop_size=hop_size, mel_bins=mel_bins, fmin=fmin, fmax=fmax, 
+    model = Model(sample_rate=sample_rate_model, window_size=window_size,
+        hop_size=hop_size, mel_bins=mel_bins, fmin=fmin, fmax=fmax,
         classes_num=classes_num)
-    
+
     checkpoint = torch.load(checkpoint_path, map_location=device)
     model.load_state_dict(checkpoint['model'])
 
@@ -48,9 +49,9 @@ def audio_tagging(args):
         model = torch.nn.DataParallel(model)
     else:
         print('Using CPU.')
-    
+
     # Load audio
-    (waveform, _) = librosa.core.load(audio_path, sr=sample_rate, mono=True)
+    (waveform, _) = librosa.core.load(audio_path, sr=sample_rate_data, mono=True)
 
     waveform = waveform[None, :]    # (1, audio_length)
     waveform = move_data_to_device(waveform, device)
@@ -67,7 +68,7 @@ def audio_tagging(args):
 
     # Print audio tagging top probabilities
     for k in range(10):
-        print('{}: {:.3f}'.format(np.array(labels)[sorted_indexes[k]], 
+        print('{}: {:.3f}'.format(np.array(labels)[sorted_indexes[k]],
             clipwise_output[sorted_indexes[k]]))
 
     # Print embedding
@@ -83,7 +84,8 @@ def sound_event_detection(args):
     """
 
     # Arugments & parameters
-    sample_rate = args.sample_rate
+    sample_rate_model = args.sample_rate_model
+    sample_rate_data = args.sample_rate_data
     window_size = args.window_size
     hop_size = args.hop_size
     mel_bins = args.mel_bins
@@ -96,7 +98,7 @@ def sound_event_detection(args):
 
     classes_num = config.classes_num
     labels = config.labels
-    frames_per_second = sample_rate // hop_size
+    frames_per_second = sample_rate_data // hop_size
 
     # Paths
     fig_path = os.path.join('results', '{}.png'.format(get_filename(audio_path)))
@@ -104,10 +106,10 @@ def sound_event_detection(args):
 
     # Model
     Model = eval(model_type)
-    model = Model(sample_rate=sample_rate, window_size=window_size, 
-        hop_size=hop_size, mel_bins=mel_bins, fmin=fmin, fmax=fmax, 
+    model = Model(sample_rate=sample_rate_model, window_size=window_size,
+        hop_size=hop_size, mel_bins=mel_bins, fmin=fmin, fmax=fmax,
         classes_num=classes_num)
-    
+
     checkpoint = torch.load(checkpoint_path, map_location=device)
     model.load_state_dict(checkpoint['model'])
 
@@ -117,9 +119,9 @@ def sound_event_detection(args):
 
     if 'cuda' in str(device):
         model.to(device)
-    
+
     # Load audio
-    (waveform, _) = librosa.core.load(audio_path, sr=sample_rate, mono=True)
+    (waveform, _) = librosa.core.load(audio_path, sr=sample_rate_data, mono=True)
 
     waveform = waveform[None, :]    # (1, audio_length)
     waveform = move_data_to_device(waveform, device)
@@ -138,11 +140,11 @@ def sound_event_detection(args):
     sorted_indexes = np.argsort(np.max(framewise_output, axis=0))[::-1]
 
     top_k = 10  # Show top results
-    top_result_mat = framewise_output[:, sorted_indexes[0 : top_k]]    
+    top_result_mat = framewise_output[:, sorted_indexes[0 : top_k]]
     """(time_steps, top_k)"""
 
-    # Plot result    
-    stft = librosa.core.stft(y=waveform[0].data.cpu().numpy(), n_fft=window_size, 
+    # Plot result
+    stft = librosa.core.stft(y=waveform[0].data.cpu().numpy(), n_fft=window_size,
         hop_length=hop_size, window='hann', center=True)
     frames_num = stft.shape[-1]
 
@@ -172,29 +174,31 @@ if __name__ == '__main__':
     subparsers = parser.add_subparsers(dest='mode')
 
     parser_at = subparsers.add_parser('audio_tagging')
-    parser_at.add_argument('--sample_rate', type=int, default=32000)
+    parser_at.add_argument('--sample_rate_model', type=int, default=32000)
+    parser_at.add_argument('--sample_rate_data', type=int, default=32000)
     parser_at.add_argument('--window_size', type=int, default=1024)
     parser_at.add_argument('--hop_size', type=int, default=320)
     parser_at.add_argument('--mel_bins', type=int, default=64)
     parser_at.add_argument('--fmin', type=int, default=50)
-    parser_at.add_argument('--fmax', type=int, default=14000) 
+    parser_at.add_argument('--fmax', type=int, default=14000)
     parser_at.add_argument('--model_type', type=str, required=True)
     parser_at.add_argument('--checkpoint_path', type=str, required=True)
     parser_at.add_argument('--audio_path', type=str, required=True)
     parser_at.add_argument('--cuda', action='store_true', default=False)
 
     parser_sed = subparsers.add_parser('sound_event_detection')
-    parser_sed.add_argument('--sample_rate', type=int, default=32000)
+    parser_at.add_argument('--sample_rate_model', type=int, default=32000)
+    parser_at.add_argument('--sample_rate_data', type=int, default=32000)
     parser_sed.add_argument('--window_size', type=int, default=1024)
     parser_sed.add_argument('--hop_size', type=int, default=320)
     parser_sed.add_argument('--mel_bins', type=int, default=64)
     parser_sed.add_argument('--fmin', type=int, default=50)
-    parser_sed.add_argument('--fmax', type=int, default=14000) 
+    parser_sed.add_argument('--fmax', type=int, default=14000)
     parser_sed.add_argument('--model_type', type=str, required=True)
     parser_sed.add_argument('--checkpoint_path', type=str, required=True)
     parser_sed.add_argument('--audio_path', type=str, required=True)
     parser_sed.add_argument('--cuda', action='store_true', default=False)
-    
+
     args = parser.parse_args()
 
     if args.mode == 'audio_tagging':
