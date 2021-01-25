@@ -1,5 +1,6 @@
 import os
 import sys
+import glob
 sys.path.insert(1, os.path.join(sys.path[0], '../utils'))
 import numpy as np
 import argparse
@@ -50,31 +51,35 @@ def audio_tagging(args):
     else:
         print('Using CPU.')
 
-    # Load audio
-    (waveform, _) = librosa.core.load(audio_path, sr=sample_rate_data, mono=True)
+    for fname in glob.glob(audio_path):
 
-    waveform = waveform[None, :]    # (1, audio_length)
-    waveform = move_data_to_device(waveform, device)
+        print("Inference for:", fname)
 
-    # Forward
-    with torch.no_grad():
-        model.eval()
-        batch_output_dict = model(waveform, None)
+        # Load audio
+        (waveform, _) = librosa.core.load(fname, sr=sample_rate_data, mono=True)
 
-    clipwise_output = batch_output_dict['clipwise_output'].data.cpu().numpy()[0]
-    """(classes_num,)"""
+        waveform = waveform[None, :]    # (1, audio_length)
+        waveform = move_data_to_device(waveform, device)
 
-    sorted_indexes = np.argsort(clipwise_output)[::-1]
+        # Forward
+        with torch.no_grad():
+            model.eval()
+            batch_output_dict = model(waveform, None)
 
-    # Print audio tagging top probabilities
-    for k in range(10):
-        print('{}: {:.3f}'.format(np.array(labels)[sorted_indexes[k]],
-            clipwise_output[sorted_indexes[k]]))
+        clipwise_output = batch_output_dict['clipwise_output'].data.cpu().numpy()[0]
+        """(classes_num,)"""
 
-    # Print embedding
-    if 'embedding' in batch_output_dict.keys():
-        embedding = batch_output_dict['embedding'].data.cpu().numpy()[0]
-        print('embedding: {}'.format(embedding.shape))
+        sorted_indexes = np.argsort(clipwise_output)[::-1]
+
+        # Print audio tagging top probabilities
+        for k in range(10):
+            print('{}: {:.3f}'.format(np.array(labels)[sorted_indexes[k]],
+                clipwise_output[sorted_indexes[k]]))
+
+        # Print embedding
+        if 'embedding' in batch_output_dict.keys():
+            embedding = batch_output_dict['embedding'].data.cpu().numpy()[0]
+            print('embedding: {}'.format(embedding.shape))
 
     return clipwise_output, labels
 
