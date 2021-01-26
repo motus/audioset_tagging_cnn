@@ -19,8 +19,7 @@ def audio_tagging(args):
     """
 
     # Arugments & parameters
-    sample_rate_model = args.sample_rate_model
-    sample_rate_data = args.sample_rate_data
+    sample_rate = args.sample_rate
     window_size = args.window_size
     hop_size = args.hop_size
     mel_bins = args.mel_bins
@@ -38,7 +37,7 @@ def audio_tagging(args):
 
     # Model
     Model = eval(model_type)
-    model = Model(sample_rate=sample_rate_model, window_size=window_size,
+    model = Model(sample_rate=sample_rate, window_size=window_size,
         hop_size=hop_size, mel_bins=mel_bins, fmin=fmin, fmax=fmax,
         classes_num=classes_num)
 
@@ -59,13 +58,13 @@ def audio_tagging(args):
 
     for fname in glob.glob(audio_path):
 
-        print("# Inference for:", fname)
-
         # Load audio
-        (waveform, _) = librosa.core.load(fname, sr=sample_rate_data, mono=True)
+        (waveform, _) = librosa.core.load(fname, sr=sample_rate, mono=True)
 
         waveform = waveform[None, :]    # (1, audio_length)
         waveform = move_data_to_device(waveform, device)
+
+        print("# File:", fname, waveform.shape)
 
         # Forward
         with torch.no_grad():
@@ -98,8 +97,7 @@ def sound_event_detection(args):
     """
 
     # Arugments & parameters
-    sample_rate_model = args.sample_rate_model
-    sample_rate_data = args.sample_rate_data
+    sample_rate = args.sample_rate
     window_size = args.window_size
     hop_size = args.hop_size
     mel_bins = args.mel_bins
@@ -112,7 +110,7 @@ def sound_event_detection(args):
 
     classes_num = config.classes_num
     labels = config.labels
-    frames_per_second = sample_rate_data // hop_size
+    frames_per_second = sample_rate // hop_size
 
     # Paths
     fig_path = os.path.join('results', '{}.png'.format(get_filename(audio_path)))
@@ -120,7 +118,7 @@ def sound_event_detection(args):
 
     # Model
     Model = eval(model_type)
-    model = Model(sample_rate=sample_rate_model, window_size=window_size,
+    model = Model(sample_rate=sample_rate, window_size=window_size,
         hop_size=hop_size, mel_bins=mel_bins, fmin=fmin, fmax=fmax,
         classes_num=classes_num)
 
@@ -135,7 +133,7 @@ def sound_event_detection(args):
         model.to(device)
 
     # Load audio
-    (waveform, _) = librosa.core.load(audio_path, sr=sample_rate_data, mono=True)
+    (waveform, _) = librosa.core.load(audio_path, sr=sample_rate, mono=True)
 
     waveform = waveform[None, :]    # (1, audio_length)
     waveform = move_data_to_device(waveform, device)
@@ -188,8 +186,7 @@ if __name__ == '__main__':
     subparsers = parser.add_subparsers(dest='mode')
 
     parser_at = subparsers.add_parser('audio_tagging')
-    parser_at.add_argument('--sample_rate_model', type=int, default=32000)
-    parser_at.add_argument('--sample_rate_data', type=int, default=32000)
+    parser_at.add_argument('--sample_rate', type=int, default=32000)
     parser_at.add_argument('--window_size', type=int, default=1024)
     parser_at.add_argument('--hop_size', type=int, default=320)
     parser_at.add_argument('--mel_bins', type=int, default=64)
@@ -202,8 +199,7 @@ if __name__ == '__main__':
     parser_at.add_argument('--print_csv', action='store_true', default=False)
 
     parser_sed = subparsers.add_parser('sound_event_detection')
-    parser_sed.add_argument('--sample_rate_model', type=int, default=32000)
-    parser_sed.add_argument('--sample_rate_data', type=int, default=32000)
+    parser_sed.add_argument('--sample_rate', type=int, default=32000)
     parser_sed.add_argument('--window_size', type=int, default=1024)
     parser_sed.add_argument('--hop_size', type=int, default=320)
     parser_sed.add_argument('--mel_bins', type=int, default=64)
