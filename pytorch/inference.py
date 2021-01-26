@@ -47,25 +47,26 @@ def audio_tagging(args):
     # Parallel
     if 'cuda' in str(device):
         model.to(device)
-        print('# GPU number: {}'.format(torch.cuda.device_count()))
+        sys.stderr.write('# GPU number: {}\n'.format(torch.cuda.device_count()))
         model = torch.nn.DataParallel(model)
     else:
-        print('# Using CPU.')
-        pass
+        sys.stderr.write('# Using CPU.\n')
 
     if print_csv:
         print("%s,%s" % ("filename", ",".join(label_ids)))
 
-    for fname in glob.glob(audio_path, recursive=True):
+    input_size = sample_rate * 10  # 10 seconds
+
+    for (i, fname) in enumerate(glob.glob(audio_path, recursive=True)):
 
         # Load audio
         (waveform, _) = librosa.core.load(fname, sr=sample_rate, mono=True)
 
-        waveform = waveform[None, :]    # (1, audio_length)
+        waveform = waveform[None, :input_size]    # (1, audio_length)
 
-        # print("# File:", fname, waveform.shape)
+        sys.stderr.write("# File %d: %s\n" % (i, fname))
 
-        pad = sample_rate * 10 - waveform.shape[1]
+        pad = input_size - waveform.shape[1]
         if pad > 0:
             # pad to 10 seconds
             waveform = np.pad(waveform, ((0, 0), (0, pad)), 'constant')
@@ -95,7 +96,7 @@ def audio_tagging(args):
                 embedding = batch_output_dict['embedding'].data.cpu().numpy()[0]
                 print('# = embedding: {}'.format(embedding.shape))
 
-    return clipwise_output, labels
+    return None  # TODO: return clipwise_output, labels
 
 
 def sound_event_detection(args):
