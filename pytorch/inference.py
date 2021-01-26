@@ -56,14 +56,14 @@ def audio_tagging(args):
     if print_csv:
         print("%s,%s" % ("filename", ",".join(label_ids)))
 
-    for fname in glob.glob(audio_path):
+    for fname in glob.glob(audio_path, recursive=True):
 
         # Load audio
         (waveform, _) = librosa.core.load(fname, sr=sample_rate, mono=True)
 
         waveform = waveform[None, :]    # (1, audio_length)
 
-        print("# File:", fname, waveform.shape)
+        # print("# File:", fname, waveform.shape)
 
         pad = sample_rate * 10 - waveform.shape[1]
         if pad > 0:
