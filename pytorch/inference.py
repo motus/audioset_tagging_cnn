@@ -62,9 +62,15 @@ def audio_tagging(args):
         (waveform, _) = librosa.core.load(fname, sr=sample_rate, mono=True)
 
         waveform = waveform[None, :]    # (1, audio_length)
-        waveform = move_data_to_device(waveform, device)
 
         print("# File:", fname, waveform.shape)
+
+        pad = sample_rate * 10 - waveform.shape[1]
+        if pad > 0:
+            # pad to 10 seconds
+            waveform = np.pad(waveform, ((0, 0), (0, pad)), 'constant')
+
+        waveform = move_data_to_device(waveform, device)
 
         # Forward
         with torch.no_grad():
