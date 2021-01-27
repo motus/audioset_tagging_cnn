@@ -99,6 +99,7 @@ def audio_tagging(args):
         waveform = move_data_to_device(waveform, device)
 
         batch_output_dict = eval_model(model, waveform, onnx_export)
+        onnx_export = False  # Export only once for the first sample
 
         clipwise_output = batch_output_dict['clipwise_output'].data.cpu().numpy()[0]
         """(classes_num,)"""
