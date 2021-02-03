@@ -1,14 +1,12 @@
 models/
-*
-!*/
-!*.*
 *.hdf5
 *.pyc
 *.wav
-__pycache__
-_logs
+__pycache__/
+_logs/
 *.pth
 *.onnx
 *.png
 .R*
 paper_statistics
+*.csv.bz2
