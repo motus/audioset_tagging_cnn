@@ -71,8 +71,8 @@ def audio_tagging(args):
     model.load_state_dict(checkpoint['model'])
 
     onnx_model = onnxruntime.InferenceSession(onnx_model_path)
-    print("ONNX  inputs:", [(i.name, i.type, i.shape) for i in onnx_model.get_inputs()])
-    print("ONNX outputs:", [(i.name, i.type, i.shape) for i in onnx_model.get_outputs()])
+    print("# ONNX  inputs:", [(i.name, i.type, i.shape) for i in onnx_model.get_inputs()])
+    print("# ONNX outputs:", [(i.name, i.type, i.shape) for i in onnx_model.get_outputs()])
 
     if print_csv:
         print("%s,%s" % ("filename", ",".join(label_ids)))
@@ -99,8 +99,8 @@ def audio_tagging(args):
         with torch.no_grad():
             model.eval()
             features = model.prepare(waveform)
-            print("Waveform:", waveform.shape)
-            print("Features:", [t.shape for t in features])
+            print("# Waveform:", waveform.shape)
+            print("# Features:", [t.shape for t in features])
             batch_output_dict = {}
             clipwise_output = onnx_model.run(
                 None, {'0': np.array(features[0])})[0].squeeze()  # FIXME: MobileNet only!
