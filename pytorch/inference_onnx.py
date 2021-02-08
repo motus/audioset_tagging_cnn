@@ -15,30 +15,6 @@ from pytorch_utils import move_data_to_device
 import config
 
 
-def eval_model(model, waveform, onnx_export=None):
-
-    # Forward
-    with torch.no_grad():
-
-        model.eval()
-
-        features = model.prepare(waveform)
-        batch_output_dict = model(*features)
-
-        if onnx_export is not None:
-            print("Export ONNX to: %s" % onnx_export)
-            torch.onnx.export(
-                model,
-                features,
-                onnx_export,
-                verbose=True,
-                export_params=True,
-                opset_version=11,
-                do_constant_folding=True)
-
-        return batch_output_dict
-
-
 def audio_tagging(args):
     """Inference audio tagging result of an audio clip.
     """
@@ -51,7 +27,6 @@ def audio_tagging(args):
     fmin = args.fmin
     fmax = args.fmax
     model_type = args.model_type
-    checkpoint_path = args.checkpoint_path
     audio_path = args.audio_path
     device = torch.device('cuda') if args.cuda and torch.cuda.is_available() else torch.device('cpu')
     onnx_model_path = args.onnx_model_path
@@ -61,14 +36,11 @@ def audio_tagging(args):
     labels = config.labels
     label_ids = config.ids
 
-    # Model
+    # PyTorch Model - we need it only for .prepare()
     Model = eval(model_type)
     model = Model(sample_rate=sample_rate, window_size=window_size,
         hop_size=hop_size, mel_bins=mel_bins, fmin=fmin, fmax=fmax,
         classes_num=classes_num)
-
-    checkpoint = torch.load(checkpoint_path, map_location=device)
-    model.load_state_dict(checkpoint['model'])
 
     onnx_model = onnxruntime.InferenceSession(onnx_model_path)
     print("# ONNX  inputs:", [(i.name, i.type, i.shape) for i in onnx_model.get_inputs()])
@@ -95,7 +67,6 @@ def audio_tagging(args):
 
         waveform = move_data_to_device(waveform, device)
 
-        # batch_output_dict = eval_model(model, waveform, onnx_export)
         with torch.no_grad():
             model.eval()
             features = model.prepare(waveform)
@@ -225,7 +196,6 @@ if __name__ == '__main__':
     parser_at.add_argument('--fmin', type=int, default=50)
     parser_at.add_argument('--fmax', type=int, default=14000)
     parser_at.add_argument('--model_type', type=str, required=True)
-    parser_at.add_argument('--checkpoint_path', type=str, required=True)
     parser_at.add_argument('--onnx_model_path', type=str, required=True)
     parser_at.add_argument('--audio_path', type=str, required=True)
     parser_at.add_argument('--cuda', action='store_true', default=False)
