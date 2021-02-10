@@ -3,7 +3,7 @@
 import argparse
 
 import pandas
-import ontology
+import ontology  # From https://github.com/motus/audiosetdl
 
 
 def aggregate_labels(fname_input, fname_3way, fname_audioset,
@@ -16,6 +16,7 @@ def aggregate_labels(fname_input, fname_3way, fname_audioset,
     in audiosetdl format.
     """
 
+    # The data is from https://github.com/audioset/ontology
     ont = ontology.Ontology("ontology.json")
 
     labels_all = frozenset(ont.all_children(ont.top()).keys())
